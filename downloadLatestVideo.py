@@ -68,16 +68,7 @@ def download_latest_video(channelHandle):
 
 
 if __name__=="__main__":
-    # print(sys.argv[-1])
-    # print(get_latest_info("druvrathee"))
     download_latest_video(sys.argv[-1])
 
-    # with open("downloadedVideos_dhruvrathee.txt","r") as fl:
-    #     print(fl.read()=="hello")
-    #     print(fl.read()=="hello")
-    #     # temp = fl.read()
-    #     # print(temp)
-    #     if(fl.read()=="hello"):
-    #         print("ran")
     
 

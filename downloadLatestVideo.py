@@ -1,4 +1,5 @@
 import requests
+import json
 from bs4 import BeautifulSoup
 from yt_dlp.YoutubeDL import YoutubeDL
 import sys
@@ -32,22 +33,35 @@ def get_latest_info(channelHandle):
 def download_latest_video(channelHandle):
     videoid = get_latest_info(channelHandle)
     # downloadedvids = open(f"downloadedVideos_{channelHandle}.txt","r")
-    downloadedvids = ""
+    downloadedvids = {}
 
     try:
-        vidfile = open(f"downloadedVideos_{channelHandle}.txt","r")
-        downloadedvids=vidfile.read()
-        vidfile.close()
+        vidfile_read = open("downloadedVideos.json","r")
+        downloadedvids = json.load(vidfile_read)
+        vidfile_read.close()
+    except json.decoder.JSONDecodeError:
+        pass
     except FileNotFoundError:
-        vidfile = open(f"downloadedVideos_{channelHandle}.txt","w")
-        vidfile.close()
-    if (downloadedvids != videoid):
-        vidfile = open(f"downloadedVideos_{channelHandle}.txt","w")
-        vidfile.write(videoid)
-        vidfile.close()
-        ydl.download([f"https://www.youtube.com/watch?v={videoid}"])
+        vidfile_read = open("downloadedVideos.json","w")
+        vidfile_read.close()
+    if (channelHandle in downloadedvids):
+        if downloadedvids[channelHandle] != videoid:
+            vidfile_write = open("downloadedVideos.json","w")
+            ydl.download([f"https://www.youtube.com/watch?v={videoid}"])
+            downloadedvids[channelHandle]=videoid
+            json.dump(downloadedvids,vidfile_write,indent=4)
+            vidfile_write.close()
+        else:
+            print(f"No new {channelHandle} videos to download.")
     else:
-        print(f"No new videos {channelHandle} to download")
+            vidfile_write = open(f"downloadedVideos.json","w")
+            ydl.download([f"https://www.youtube.com/watch?v={videoid}"])
+            downloadedvids[channelHandle]=videoid
+            json.dump(downloadedvids,vidfile_write,indent=4)
+            vidfile_write.close()
+
+    # else:
+    #     print(f"No new {channelHandle} videos to download")
 
 
 

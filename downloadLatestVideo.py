@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import yt_dlp
 from yt_dlp.YoutubeDL import YoutubeDL
 import json
 import sys
@@ -37,7 +38,6 @@ def get_latest_info(channelHandle):
 # downloads video only once for every channel handle
 def download_latest_video(channelHandle):
     videoid = get_latest_info(channelHandle)
-    # downloadedvids = open(f"downloadedVideos_{channelHandle}.txt","r")
     downloadedvids = {}
 
     try:
@@ -52,16 +52,26 @@ def download_latest_video(channelHandle):
     if (channelHandle in downloadedvids):
         if downloadedvids[channelHandle] != videoid:
             vidfile_write = open("downloadedVideos.json","w")
-            ydl.download([f"https://www.youtube.com/watch?v={videoid}"])
-            downloadedvids[channelHandle]=videoid
+            try:
+                ydl.download([f"https://www.youtube.com/watch?v={videoid}"])
+                downloadedvids[channelHandle]=videoid
+            except yt_dlp.utils.DownloadError:
+                print("A download error occured.")
+                print(yt_dlp.utils.DownloadError)
+            
             json.dump(downloadedvids,vidfile_write,indent=4)
             vidfile_write.close()
         else:
             print(f"No new {channelHandle} videos to download.")
     else:
             vidfile_write = open(f"downloadedVideos.json","w")
-            ydl.download([f"https://www.youtube.com/watch?v={videoid}"])
-            downloadedvids[channelHandle]=videoid
+            try:
+                ydl.download([f"https://www.youtube.com/watch?v={videoid}"])
+                downloadedvids[channelHandle]=videoid
+            except yt_dlp.utils.DownloadError:
+                print("A download error occured.")
+                print(yt_dlp.utils.DownloadError)
+                
             json.dump(downloadedvids,vidfile_write,indent=4)
             vidfile_write.close()
 
